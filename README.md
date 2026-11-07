@@ -76,6 +76,20 @@ assert!(queue.push(1).is_ok());
 assert_eq!(queue.push(2), Err(2));
 ```
 
+Splitting the queue encodes the thread roles in the types instead:
+
+```rust
+use std::thread;
+use tiny_ringbuf::RingBuffer;
+
+let queue = RingBuffer::with_capacity(16);
+thread::scope(|scope| {
+    let (producer, consumer) = queue.split();
+    scope.spawn(move || producer.push(1).unwrap());
+    assert_eq!(consumer.pop(), Some(1));
+});
+```
+
 `drain_with` consumes the remainder in order, and `Debug` prints capacity and
 length without requiring `T: Debug`.
 
@@ -96,8 +110,10 @@ so the policy matters more than the capacity. Re-measure before quoting.
 
 ```
 src/lib.rs        queue, invariants, Drop
+src/handles/mod.rs  Producer/Consumer halves from `split`
 src/main.rs       producer/consumer demo, prints throughput
 src/bin/bench.rs  capacity sweep
+examples/split.rs scoped-thread demo of the split API
 tests/ring.rs     full/empty transitions and slot reuse
 ```
 
