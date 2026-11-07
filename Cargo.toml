@@ -1,0 +1,12 @@
+[package]
+name = "tiny-ringbuf"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Fixed-capacity single-producer/single-consumer ring buffer with no allocation on the hot path"
+repository = "https://github.com/d9dlu16teq/tiny-ringbuf"
+
+[dependencies]
+
+[profile.release]
+debug = true
