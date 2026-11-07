@@ -20,12 +20,16 @@
 //! # Failure modes
 //!
 //! * Two producers or two consumers at once: counters desync, values are lost
-//!   or read twice. The type only checks this with `debug_assert`s where it is
-//!   cheap; split ownership yourself.
+//!   or read twice. `push`/`pop` take `&self`, so nothing stops it; borrow the
+//!   queue through [`RingBuffer::split`] to make the roles explicit.
 //! * Dropping the buffer while a producer or consumer still holds `&self` is
 //!   not allowed. Join the threads first.
 //! * A full buffer rejects the value instead of blocking. Backoff policy
 //!   belongs to the caller; see `src/main.rs` for a spin/yield loop.
+
+mod handles;
+
+pub use handles::{Consumer, Producer};
 
 use std::cell::UnsafeCell;
 use std::mem::MaybeUninit;
